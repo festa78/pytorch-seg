@@ -59,11 +59,11 @@ class ReLabel(object):
 
 class ToSP(object):
     def __init__(self, size):
-        self.scale2 = Scale(size/2, Image.NEAREST)
-        self.scale4 = Scale(size/4, Image.NEAREST)
-        self.scale8 = Scale(size/8, Image.NEAREST)
-        self.scale16 = Scale(size/16, Image.NEAREST)
-        self.scale32 = Scale(size/32, Image.NEAREST)
+        self.scale2 = Scale(int(size/2), Image.NEAREST)
+        self.scale4 = Scale(int(size/4), Image.NEAREST)
+        self.scale8 = Scale(int(size/8), Image.NEAREST)
+        self.scale16 = Scale(int(size/16), Image.NEAREST)
+        self.scale32 = Scale(int(size/32), Image.NEAREST)
 
     def __call__(self, input):
         input2 = self.scale2(input)

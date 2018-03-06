@@ -1,45 +1,56 @@
 from __future__ import division
+
+import json
+import numpy as np
+from PIL import Image
 import torch
 from torch.autograd import Variable
 from torch.utils import data
+from torchvision.transforms import Compose, CenterCrop, Normalize, ToTensor
+import tqdm
+
 # from resnet import FCN
-from upsample import FCN
+from duc import FCN
 # from gcn import FCN
-from datasets import VOCDataSet
+from datasets_bowl import BowlDataSet
 from loss import CrossEntropy2d, CrossEntropyLoss2d
 from visualize import LinePlotter
 from transform import ReLabel, ToLabel, ToSP, Scale
-from torchvision.transforms import Compose, CenterCrop, Normalize, ToTensor
-import tqdm
-from PIL import Image
-import numpy as np
+
+# Constants
+NUM_CLASSES = 2
+
+normalize_info = json.load(open('../../input/drn/v1/info.json', 'r'))
+mean = [m / 255. for m in normalize_info['mean']]
+std = [m / 255. for m in normalize_info['std']]
 
 input_transform = Compose([
     Scale((256, 256), Image.BILINEAR),
     ToTensor(),
-    Normalize([.485, .456, .406], [.229, .224, .225]),
+    Normalize(mean, std),
 ])
+
 target_transform = Compose([
     Scale((256, 256), Image.NEAREST),
     ToSP(256),
     ToLabel(),
-    ReLabel(255, 21),
+    # ReLabel(255, 21),
 ])
 
-trainloader = data.DataLoader(VOCDataSet("./data", img_transform=input_transform,
+trainloader = data.DataLoader(BowlDataSet("../../input/drn/v1/", img_transform=input_transform,
                                          label_transform=target_transform),
                               batch_size=16, shuffle=True, pin_memory=True)
 
 if torch.cuda.is_available():
-    model = torch.nn.DataParallel(FCN(22))
+    model = torch.nn.DataParallel(FCN(NUM_CLASSES))
     model.cuda()
 
 epoches = 80
 lr = 1e-4
 weight_decay = 2e-5
 momentum = 0.9
-weight = torch.ones(22)
-weight[21] = 0
+weight = torch.ones(NUM_CLASSES)
+# weight[21] = 0
 max_iters = 92*epoches
 
 criterion = CrossEntropyLoss2d(weight.cuda())
@@ -50,7 +61,7 @@ ploter = LinePlotter()
 model.train()
 for epoch in range(epoches):
     running_loss = 0.0
-    for i, (images, labels_group) in tqdm.tqdm(enumerate(trainloader)):
+    for i, (images, labels_group) in tqdm.tqdm(enumerate(trainloader), total=int(len(trainloader.dataset) / trainloader.batch_size)):
         if torch.cuda.is_available():
             images = [Variable(image.cuda()) for image in images]
             labels_group = [labels for labels in labels_group]

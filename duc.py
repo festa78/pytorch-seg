@@ -64,11 +64,11 @@ class FCN(nn.Module):
                           kernel_size=3, padding=1)
             )
         return nn.Sequential(
-            nn.Conv2d(inplanes, inplanes/2, 3, padding=1, bias=False),
-            nn.BatchNorm2d(inplanes/2, momentum=.95),
+            nn.Conv2d(inplanes, int(inplanes/2), 3, padding=1, bias=False),
+            nn.BatchNorm2d(int(inplanes/2), momentum=.95),
             nn.ReLU(inplace=True),
             nn.Dropout(.1),
-            nn.Conv2d(inplanes/2, self.num_classes, 1),
+            nn.Conv2d(int(inplanes/2), self.num_classes, 1),
         )
 
     def forward(self, x):
