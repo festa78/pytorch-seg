@@ -10,14 +10,15 @@ from torchvision.transforms import Compose, CenterCrop, Normalize, ToTensor
 import tqdm
 
 # from resnet import FCN
-from duc import FCN
+from upsample_softmax import FCN
+# from duc import FCN
 # from gcn import FCN
 from datasets_bowl import BowlDataSet
 from loss import CrossEntropy2d, CrossEntropyLoss2d
 from visualize import LinePlotter
 from transform import ReLabel, ToLabel, ToSP, Scale
 
-# Constants
+# NUM_CLASSES.
 NUM_CLASSES = 2
 
 normalize_info = json.load(open('../../input/drn/v1/info.json', 'r'))

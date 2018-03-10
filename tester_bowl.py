@@ -12,6 +12,7 @@ from transform import Colorize
 from transform import Scale
 # from resnet import FCN
 from upsample import FCN
+# from duc import FCN
 # from gcn import FCN
 from datasets_bowl import BowlTestSet
 
@@ -36,7 +37,7 @@ testloader = data.DataLoader(dst, batch_size=batch_size,
 
 model = torch.nn.DataParallel(FCN(NUM_CLASSES))
 model.cuda()
-model.load_state_dict(torch.load("./pth/fcn-deconv-80.pth"))
+model.load_state_dict(torch.load("./pth/fcn-deconv-60.pth"))
 model.eval()
 
 for index, (imgs, name, size) in tqdm(enumerate(testloader)):
