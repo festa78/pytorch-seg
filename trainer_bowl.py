@@ -45,6 +45,7 @@ trainloader = data.DataLoader(BowlDataSet("../../input/drn/v1/", img_transform=i
 if torch.cuda.is_available():
     model = torch.nn.DataParallel(FCN(NUM_CLASSES))
     model.cuda()
+    model.load_state_dict(torch.load("./pth/fcn-deconv.pth"))
 
 epoches = 80
 lr = 1e-4

@@ -78,7 +78,8 @@ class FCN(nn.Module):
             return nn.Sequential(
                 nn.Conv2d(inplanes, self.num_classes, 1),
                 nn.Conv2d(self.num_classes, self.num_classes,
-                          kernel_size=3, padding=1)
+                          kernel_size=3, padding=1),
+                nn.Softmax()
             )
         return nn.Sequential(
             nn.Conv2d(inplanes, int(inplanes/2), 3, padding=1, bias=False),

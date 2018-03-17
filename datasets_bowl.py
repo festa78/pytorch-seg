@@ -6,6 +6,7 @@ import os.path as osp
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
+from skimage.io import imread
 import torch
 import torchvision
 from torch.utils import data
@@ -67,18 +68,24 @@ class BowlTestSet(data.Dataset):
     def __init__(self, root, transform=None):
         self.root = root
         self.transform = transform
-        self.img_names = glob.glob(osp.join(self.root, 'test', 'rgb/*.png'))
+        # Get test IDs.
+        self.test_ids = next(os.walk(self.root))[1]
+
+        # Get test images and their sizes.
+        self.img_names = []
+        for n, id_ in enumerate(self.test_ids):
+            self.img_names.append(osp.join(self.root, id_, 'images/', id_ + '.png'))
 
     def __len__(self):
         return len(self.img_names)
 
     def __getitem__(self, index):
         filepath = self.img_names[index]
-        img = Image.open(filepath).convert('RGB')
-        size = img.size
+        img = imread(filepath)[...,:3]
+        size = img.shape
         name = osp.basename(filepath)
 
         if self.transform is not None:
-            img = self.transform(img)
+            img = self.transform(Image.fromarray(img))
 
         return img, name, size
